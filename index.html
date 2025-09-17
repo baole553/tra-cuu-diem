@@ -114,84 +114,83 @@
     <div id="result"></div>
 
     <script>
-        // Hàm tính hạng cho một bài kiểm tra
-        function getTestRank(testIndex, score) {
-            const scores = students.map(s => s.scores[testIndex]);
-            const higher = scores.filter(s => s > score).length;
-            return higher + 1;
+  <script>
+    // Hàm tính hạng cho một bài kiểm tra
+    function getTestRank(testIndex, score) {
+        const scores = students.map(s => s.scores[testIndex]);
+        const higher = scores.filter(s => s > score + 1e-9).length; // tránh lỗi số thực
+        return higher + 1;
+    }
+
+    // Hàm tính tổng điểm
+    function getTotalScore(scores) {
+        return scores.reduce((a, b) => a + b, 0); // trả về số
+    }
+
+    // Hàm tính hạng tổng
+    function getTotalRank(totalScore) {
+        const totals = students.map(s => getTotalScore(s.scores));
+        const higher = totals.filter(s => s > totalScore + 1e-9).length;
+        return higher + 1;
+    }
+
+    // Hàm tra cứu điểm
+    function searchScores() {
+        const inputName = document.getElementById("studentName").value.trim();
+        const resultDiv = document.getElementById("result");
+
+        if (!inputName) {
+            resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
+            return;
         }
 
-        // Hàm tính tổng điểm
-        function getTotalScore(scores) {
-            return scores.reduce((a, b) => a + b, 0); // Trả về số thực
+        const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
+
+        if (!student) {
+            resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
+            return;
         }
 
-        // Hàm tính hạng tổng
-        function getTotalRank(totalScore) {
-            const totals = students.map(s => getTotalScore(s.scores));
-            const higher = totals.filter(s => s > totalScore).length;
-            return higher + 1;
+        const totalScore = getTotalScore(student.scores);
+        const ranks = student.scores.map((score, i) => getTestRank(i, score));
+        const totalRank = getTotalRank(totalScore);
+
+        resultDiv.innerHTML = `
+            <h3>Kết quả của ${student.name}</h3>
+            <table>
+                <tr>
+                    <th>Bài kiểm tra</th>
+                    <th>Điểm</th>
+                    <th>Hạng / 35</th>
+                </tr>
+                <tr>
+                    <td>KT 1 (8/8/2025)</td>
+                    <td>${student.scores[0]}</td>
+                    <td>${ranks[0]}/35</td>
+                </tr>
+                <tr>
+                    <td>KT 2 (22/8/2025)</td>
+                    <td>${student.scores[1]}</td>
+                    <td>${ranks[1]}/35</td>
+                </tr>
+                <tr>
+                    <td>KT 3 (17/9/2025)</td>
+                    <td>${student.scores[2]}</td>
+                    <td>${ranks[2]}/35</td>
+                </tr>
+                <tr>
+                    <td><b>Tổng điểm</b></td>
+                    <td><b>${totalScore.toFixed(1)}</b></td>
+                    <td><b>${totalRank}/35</b></td>
+                </tr>
+            </table>
+        `;
+    }
+
+    // Xử lý sự kiện nhấn Enter
+    document.getElementById("studentName").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            searchScores();
         }
-
-        // Hàm tra cứu điểm
-        function searchScores() {
-            const inputName = document.getElementById("studentName").value.trim();
-            const resultDiv = document.getElementById("result");
-
-            if (!inputName) {
-                resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
-                return;
-            }
-
-            const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
-
-            if (!student) {
-                resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
-                return;
-            }
-
-            const totalScore = getTotalScore(student.scores);
-            const ranks = student.scores.map((score, i) => getTestRank(i, score));
-            const totalRank = getTotalRank(totalScore);
-
-            resultDiv.innerHTML = `
-                <h3>Kết quả của ${student.name}</h3>
-                <table>
-                    <tr>
-                        <th>Bài kiểm tra</th>
-                        <th>Điểm</th>
-                        <th>Hạng / 35</th>
-                    </tr>
-                    <tr>
-                        <td>KT 1 (8/8/2025)</td>
-                        <td>${student.scores[0]}</td>
-                        <td>${ranks[0]}/35</td>
-                    </tr>
-                    <tr>
-                        <td>KT 2 (22/8/2025)</td>
-                        <td>${student.scores[1]}</td>
-                        <td>${ranks[1]}/35</td>
-                    </tr>
-                    <tr>
-                        <td>KT 3 (17/9/2025)</td>
-                        <td>${student.scores[2]}</td>
-                        <td>${ranks[2]}/35</td>
-                    </tr>
-                    <tr>
-                        <td><b>Tổng điểm</b></td>
-                        <td><b>${totalScore.toFixed(1)}</b></td>
-                        <td><b>${totalRank}/35</b></td>
-                    </tr>
-                </table>
-            `;
-        }
-
-        // Xử lý Enter
-        document.getElementById("studentName").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                searchScores();
-            }
-        });
-    </script>
-</body>
-</html>
+    });
+</script>
