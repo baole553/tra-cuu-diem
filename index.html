@@ -46,7 +46,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tra cứu điểm học sinh</title>
     <!-- Gọi file data.js đã có đủ 3 bài kiểm tra -->
-    <script src="data.js"></script>
+    <script src="data_with3tests.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -115,23 +115,39 @@
     <div id="result"></div>
 
     <script>
-        // Hàm tính hạng cho một bài kiểm tra
+        // Hàm tính hạng cho 1 bài kiểm tra (kiểu 1,2,4,4)
         function getTestRank(testIndex, score) {
-            const scores = students.map(s => s.scores[testIndex]);
-            const higher = scores.filter(s => s > score + 1e-9).length; // tránh lỗi số thực
-            return higher + 1;
+            const scores = students.map(s => s.scores[testIndex]).sort((a, b) => b - a);
+            let rank = 1;
+            for (let i = 0; i < scores.length; i++) {
+                if (Math.abs(scores[i] - score) < 1e-9) {
+                    return rank;
+                }
+                if (i < scores.length - 1 && scores[i] !== scores[i + 1]) {
+                    rank = i + 2;
+                }
+            }
+            return scores.length;
         }
 
         // Hàm tính tổng điểm
         function getTotalScore(scores) {
-            return scores.reduce((a, b) => a + b, 0); // trả về số
+            return scores.reduce((a, b) => a + b, 0);
         }
 
-        // Hàm tính hạng tổng
+        // Hàm tính hạng tổng (kiểu 1,2,4,4)
         function getTotalRank(totalScore) {
-            const totals = students.map(s => getTotalScore(s.scores));
-            const higher = totals.filter(s => s > totalScore + 1e-9).length;
-            return higher + 1;
+            const totals = students.map(s => getTotalScore(s.scores)).sort((a, b) => b - a);
+            let rank = 1;
+            for (let i = 0; i < totals.length; i++) {
+                if (Math.abs(totals[i] - totalScore) < 1e-9) {
+                    return rank;
+                }
+                if (i < totals.length - 1 && totals[i] !== totals[i + 1]) {
+                    rank = i + 2;
+                }
+            }
+            return totals.length;
         }
 
         // Hàm tra cứu điểm
