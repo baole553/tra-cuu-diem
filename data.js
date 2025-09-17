@@ -1,4 +1,4 @@
-const students = [
+var students = [
     { name: "Đậu Bình An", scores: [2, 6, 8.5] },
     { name: "Từ Thái An", scores: [4, 0, 8] },
     { name: "Dương Việt Anh", scores: [17, 9.5, 12.5] },
