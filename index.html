@@ -124,13 +124,14 @@
         }
 
         // Hàm tính hạng tổng
-        function getTotalRank(totalScore) {
-            const sortedTotals = students.map(s => s.scores.reduce((a,b)=>a+b,0)).sort((a, b) => b - a);
-            const index = sortedTotals.indexOf(totalScore);
-            const higherTotalsCount = sortedTotals.filter((s, i) => i < index && s > totalScore).length;
-            const sameTotalCount = sortedTotals.filter(s => s === totalScore).length;
-            return higherTotalsCount + sameTotalCount;
-        }
+  function getTotalRank(totalScore) {
+    const sortedTotals = students.map(s => s.scores.reduce((a,b)=>a+b,0)).sort((a, b) => b - a);
+    const index = sortedTotals.indexOf(totalScore);
+    const higherTotalsCount = sortedTotals.filter((s, i) => i < index && s > totalScore).length;
+    const sameTotalCount = sortedTotals.filter(s => s === totalScore).length;
+    return higherTotalsCount + sameTotalCount;
+}
+
 
         // Hàm tính tổng điểm
         function getTotalScore(scores) {
