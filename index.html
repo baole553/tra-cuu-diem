@@ -1,84 +1,162 @@
-<script>
-    // Hàm tính hạng cho một bài kiểm tra cụ thể
-    function getTestRank(testIndex, score) {
-        const sortedScores = students.map(s => s.scores[testIndex]).sort((a, b) => b - a);
-        const index = sortedScores.indexOf(score);
-        const higherScoresCount = sortedScores.filter((s, i) => i < index && s > score).length;
-        const sameScoreCount = sortedScores.filter(s => s === score).length;
-        return higherScoresCount + sameScoreCount;
-    }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu điểm học sinh</title>
+    <!-- Gọi file data.js đã có đủ 3 bài kiểm tra -->
+    <script src="data_with3tests.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 200px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tra cứu điểm kiểm tra môn chuyên - Lớp A3K54</h1>
+    <div class="input-container">
+        <input type="text" id="studentName" placeholder="Nhập tên học sinh">
+        <button onclick="searchScores()">Tra cứu</button>
+    </div>
+    <div id="result"></div>
 
-    // Hàm tính hạng tổng
-    function getTotalRank(totalScore) {
-        const sortedTotals = students.map(s => s.scores.reduce((a,b)=>a+b,0)).sort((a, b) => b - a);
-        const index = sortedTotals.indexOf(totalScore);
-        const higherTotalsCount = sortedTotals.filter((s, i) => i < index && s > totalScore).length;
-        const sameTotalCount = sortedTotals.filter(s => s === totalScore).length;
-        return higherTotalsCount + sameTotalCount;
-    }
-
-    // Hàm tính tổng điểm
-    function getTotalScore(scores) {
-        return scores.reduce((a, b) => a + b, 0).toFixed(1);
-    }
-
-    // Hàm tra cứu điểm
-    function searchScores() {
-        const inputName = document.getElementById("studentName").value.trim();
-        const resultDiv = document.getElementById("result");
-
-        if (!inputName) {
-            resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
-            return;
+    <script>
+        // Hàm tính hạng cho một bài kiểm tra cụ thể
+        function getTestRank(testIndex, score) {
+            const sortedScores = students.map(s => s.scores[testIndex]).sort((a, b) => b - a);
+            const index = sortedScores.indexOf(score);
+            const higherScoresCount = sortedScores.filter((s, i) => i < index && s > score).length;
+            const sameScoreCount = sortedScores.filter(s => s === score).length;
+            return higherScoresCount + sameScoreCount;
         }
 
-        const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
-
-        if (!student) {
-            resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
-            return;
+        // Hàm tính hạng tổng
+        function getTotalRank(totalScore) {
+            const sortedTotals = students.map(s => s.scores.reduce((a,b)=>a+b,0)).sort((a, b) => b - a);
+            const index = sortedTotals.indexOf(totalScore);
+            const higherTotalsCount = sortedTotals.filter((s, i) => i < index && s > totalScore).length;
+            const sameTotalCount = sortedTotals.filter(s => s === totalScore).length;
+            return higherTotalsCount + sameTotalCount;
         }
 
-        const totalScore = parseFloat(getTotalScore(student.scores));
-        const ranks = student.scores.map((score, i) => getTestRank(i, score));
-        const totalRank = getTotalRank(totalScore);
-
-        resultDiv.innerHTML = `
-            <h3>Kết quả của ${student.name}</h3>
-            <table>
-                <tr>
-                    <th>Bài kiểm tra</th>
-                    <th>Điểm</th>
-                    <th>Hạng / 35</th>
-                </tr>
-                <tr>
-                    <td>KT 1 (8/8/2025)</td>
-                    <td>${student.scores[0]}</td>
-                    <td>${ranks[0]}/35</td>
-                </tr>
-                <tr>
-                    <td>KT 2 (22/8/2025)</td>
-                    <td>${student.scores[1]}</td>
-                    <td>${ranks[1]}/35</td>
-                </tr>
-                <tr>
-                    <td>KT 3 (??/??/2025)</td>
-                    <td>${student.scores[2]}</td>
-                    <td>${ranks[2]}/35</td>
-                </tr>
-                <tr>
-                    <td><b>Tổng điểm</b></td>
-                    <td><b>${totalScore}</b></td>
-                    <td><b>${totalRank}/35</b></td>
-                </tr>
-            </table>
-        `;
-    }
-
-    // Xử lý Enter
-    document.getElementById("studentName").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            searchScores();
+        // Hàm tính tổng điểm
+        function getTotalScore(scores) {
+            return scores.reduce((a, b) => a + b, 0).toFixed(1);
         }
-    });
-</script>
+
+        // Hàm tra cứu điểm
+        function searchScores() {
+            const inputName = document.getElementById("studentName").value.trim();
+            const resultDiv = document.getElementById("result");
+
+            if (!inputName) {
+                resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
+                return;
+            }
+
+            const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
+
+            if (!student) {
+                resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
+                return;
+            }
+
+            const totalScore = parseFloat(getTotalScore(student.scores));
+            const ranks = student.scores.map((score, i) => getTestRank(i, score));
+            const totalRank = getTotalRank(totalScore);
+
+            resultDiv.innerHTML = `
+                <h3>Kết quả của ${student.name}</h3>
+                <table>
+                    <tr>
+                        <th>Bài kiểm tra</th>
+                        <th>Điểm</th>
+                        <th>Hạng / 35</th>
+                    </tr>
+                    <tr>
+                        <td>KT 1 (8/8/2025)</td>
+                        <td>${student.scores[0]}</td>
+                        <td>${ranks[0]}/35</td>
+                    </tr>
+                    <tr>
+                        <td>KT 2 (22/8/2025)</td>
+                        <td>${student.scores[1]}</td>
+                        <td>${ranks[1]}/35</td>
+                    </tr>
+                    <tr>
+                        <td>KT 3 (17/9/2025)</td>
+                        <td>${student.scores[2]}</td>
+                        <td>${ranks[2]}/35</td>
+                    </tr>
+                    <tr>
+                        <td><b>Tổng điểm</b></td>
+                        <td><b>${totalScore}</b></td>
+                        <td><b>${totalRank}/35</b></td>
+                    </tr>
+                </table>
+            `;
+        }
+
+        // Xử lý sự kiện nhấn Enter
+        document.getElementById("studentName").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchScores();
+            }
+        });
+    </script>
+</body>
+</html>
+
