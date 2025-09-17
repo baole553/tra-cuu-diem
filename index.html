@@ -14,7 +14,7 @@
 </head>
 <body>
     <div id="app">
-        <h1>Tra cứu điểm kiểm tra và thứ hạng</h1>
+        <h1>Tra cứu điểm kiểm tra môn chuyên - Lớp A3K54</h1>
         <input id="nameInput" type="text" placeholder="Nhập họ và tên học sinh (ví dụ: Đậu Bình An)">
         <button onclick="searchStudent()">Tra cứu</button>
         <div id="result"></div>
@@ -29,13 +29,13 @@
                 return;
             }
             var scores = student.scores;
-            var average = (scores[0] + scores[1] + scores[2]) / 3;
+            var totalScore = scores[0] + scores[1] + scores[2];
 
-            // Tính thứ hạng dựa trên trung bình (xếp hạng giảm dần)
+            // Tính thứ hạng dựa trên điểm tổng (xếp hạng giảm dần)
             var sortedStudents = students.slice().sort((a, b) => {
-                var avgA = (a.scores[0] + a.scores[1] + a.scores[2]) / 3;
-                var avgB = (b.scores[0] + b.scores[1] + b.scores[2]) / 3;
-                return avgB - avgA;
+                var totalA = a.scores[0] + a.scores[1] + a.scores[2];
+                var totalB = b.scores[0] + b.scores[1] + b.scores[2];
+                return totalB - totalA;
             });
             var rank = sortedStudents.findIndex(s => s.name === name) + 1;
 
@@ -44,8 +44,8 @@
                 <p><strong>KT 1 (8/8/2025):</strong> ${scores[0]}</p>
                 <p><strong>KT 2 (22/8/2025):</strong> ${scores[1]}</p>
                 <p><strong>KT 3 (17/9/2025):</strong> ${scores[2]}</p>
-                <p><strong>Trung bình:</strong> ${average.toFixed(2)}</p>
-                <p><strong>Thứ hạng (dựa trên trung bình):</strong> ${rank} / ${students.length}</p>
+                <p><strong>Điểm tổng:</strong> ${totalScore.toFixed(2)}</p>
+                <p><strong>Hạng điểm tổng:</strong> ${rank}/35</p>
             `;
             document.getElementById("result").innerHTML = html;
         }
