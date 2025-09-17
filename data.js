@@ -17,7 +17,7 @@ const students = [
     { name: "Nguyễn Duy Khánh", scores: [6, 1, 9.5] },
     { name: "Vũ Đình Bảo Khánh", scores: [14, 1, 9] },
     { name: "Nguyễn Vũ Trúc Lâm", scores: [12, 8, 11] },
-    { name: "Nguyễn Công Liêm", scores: [10, 3, 10] },
+    { name: "Nguyễn Công Liêm", scores: [10, 5, 10] },
     { name: "Võ Khánh Linh", scores: [13, 2, 8.25] },
     { name: "Giao Minh", scores: [12, 2, 9.75] },
     { name: "Nguyễn Đức Minh", scores: [6, 1, 6] },
