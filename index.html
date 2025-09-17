@@ -1,195 +1,54 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tra cứu điểm A3K54</title>
+    <title>Tra cứu điểm kiểm tra môn chuyên - Lớp A3K54</title>
     <script src="data.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .input-container {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        input[type="text"] {
-            padding: 10px;
-            width: 200px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #app { max-width: 600px; margin: auto; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; }
+        button { padding: 10px; width: 100%; }
+        #result { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
     </style>
 </head>
 <body>
-    <h1>Tra cứu điểm kiểm tra môn chuyên - Lớp A3K54</h1>
-    <div class="input-container">
-        <input type="text" id="studentName" placeholder="Nhập tên học sinh">
-        <button onclick="searchScores()">Tra cứu</button>
+    <div id="app">
+        <h1>Tra cứu điểm kiểm tra và thứ hạng</h1>
+        <input id="nameInput" type="text" placeholder="Nhập họ và tên học sinh (ví dụ: Đậu Bình An)">
+        <button onclick="searchStudent()">Tra cứu</button>
+        <div id="result"></div>
     </div>
-    <div id="result"></div>
 
     <script>
-        // Hàm tính hạng cho một bài kiểm tra cụ thể (standard ranking)
-        function getTestRank(testIndex, score) {
-            const sortedScores = students.map(s => s.scores[testIndex]).sort((a, b) => b - a);
-            const index = sortedScores.indexOf(score); // Vị trí đầu tiên của điểm
-            const higherScoresCount = sortedScores.filter((s, i) => i < index && s > score).length; // Số điểm cao hơn
-            const sameScoreCount = sortedScores.filter(s => s === score).length; // Số người có cùng điểm
-            return higherScoresCount + sameScoreCount; // Hạng là số người có điểm cao hơn + số người cùng điểm
-        }
-
-        // Hàm tính hạng tổng (standard ranking)
-        function getTotalRank(totalScore) {
-            const sortedTotals = students.map(s => s.scores[0] + s.scores[1]).sort((a, b) => b - a);
-            const index = sortedTotals.indexOf(totalScore);
-            const higherTotalsCount = sortedTotals.filter((s, i) => i < index && s > totalScore).length;
-            const sameTotalCount = sortedTotals.filter(s => s === totalScore).length;
-            return higherTotalsCount + sameTotalCount;
-        }
-
-        // Hàm tính tổng điểm
-        function getTotalScore(scores) {
-            return (scores[0] + scores[1]).toFixed(1);
-        }
-
-        // Hàm tra cứu điểm
-        function searchScores() {
-            const inputName = document.getElementById("studentName").value.trim();
-            const resultDiv = document.getElementById("result");
-
-            if (!inputName) {
-                resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
-                return;
-            }
-
-            const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
-
+        function searchStudent() {
+            var name = document.getElementById("nameInput").value.trim();
+            var student = students.find(s => s.name === name);
             if (!student) {
-                resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
+                document.getElementById("result").innerHTML = "<p>Không tìm thấy học sinh. Vui lòng kiểm tra tên chính xác (có dấu).</p>";
                 return;
             }
+            var scores = student.scores;
+            var average = (scores[0] + scores[1] + scores[2]) / 3;
 
-            const totalScore = getTotalScore(student.scores);
-            const kt1Rank = getTestRank(0, student.scores[0]);
-            const kt2Rank = getTestRank(1, student.scores[1]);
-            const totalRank = getTotalRank(parseFloat(totalScore));
+            // Tính thứ hạng dựa trên trung bình (xếp hạng giảm dần)
+            var sortedStudents = students.slice().sort((a, b) => {
+                var avgA = (a.scores[0] + a.scores[1] + a.scores[2]) / 3;
+                var avgB = (b.scores[0] + b.scores[1] + b.scores[2]) / 3;
+                return avgB - avgA;
+            });
+            var rank = sortedStudents.findIndex(s => s.name === name) + 1;
 
-            resultDiv.innerHTML = `
-                <h3>Kết quả của ${student.name}</h3>
-                <table>
-                    <tr>
-                        <th>Bài kiểm tra</th>
-                        <th>Điểm</th>
-                        <th>Hạng / 35</th>
-                    </tr>
-                    <tr>
-                        <td>KT 1 (8/8/2025)</td>
-                        <td>${student.scores[0]}</td>
-                        <td>${kt1Rank}/35</td>
-                    </tr>
-                    <tr>
-                        <td>KT 2 (22/8/2025)</td>
-                        <td>${student.scores[1]}</td>
-                        <td>${kt2Rank}/35</td>
-                    </tr>
-                    <tr>
-                        <td>Tổng điểm</td>
-                        <td>${totalScore}</td>
-                        <td>${totalRank}/35</td>
-                    </tr>
-                </table>
+            var html = `
+                <p><strong>Học sinh:</strong> ${name}</p>
+                <p><strong>KT 1 (8/8/2025):</strong> ${scores[0]}</p>
+                <p><strong>KT 2 (22/8/2025):</strong> ${scores[1]}</p>
+                <p><strong>KT 3 (17/9/2025):</strong> ${scores[2]}</p>
+                <p><strong>Trung bình:</strong> ${average.toFixed(2)}</p>
+                <p><strong>Thứ hạng (dựa trên trung bình):</strong> ${rank} / ${students.length}</p>
             `;
+            document.getElementById("result").innerHTML = html;
         }
-
-        // Xử lý sự kiện nhấn Enter
-        document.getElementById("studentName").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                searchScores();
-            }
-        });
     </script>
 </body>
 </html>
