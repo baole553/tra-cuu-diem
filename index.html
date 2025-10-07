@@ -74,106 +74,108 @@
     <div id="result"></div>
 
     <script>
-        // Hàm tính hạng cho 1 bài kiểm tra (kiểu 1,2,4,4)
-        function getTestRank(testIndex, score) {
-            const scores = students.map(s => s.scores[testIndex]).sort((a, b) => b - a);
-            let rank = 1;
-            for (let i = 0; i < scores.length; i++) {
-                if (Math.abs(scores[i] - score) < 1e-9) {
-                    return rank;
-                }
-                if (i < scores.length - 1 && scores[i] !== scores[i + 1]) {
-                    rank = i + 2;
-                }
+    // Hàm tính hạng cho 1 bài kiểm tra (kiểu 1,2,4,4)
+    function getTestRank(testIndex, score) {
+        // Sử dụng mảng students có 4 điểm (index 0, 1, 2, 3)
+        const scores = students.map(s => s.scores[testIndex]).sort((a, b) => b - a);
+        let rank = 1;
+        for (let i = 0; i < scores.length; i++) {
+            if (Math.abs(scores[i] - score) < 1e-9) {
+                return rank;
             }
-            return scores.length;
+            if (i < scores.length - 1 && scores[i] !== scores[i + 1]) {
+                rank = i + 2;
+            }
+        }
+        return scores.length;
+    }
+
+    // Hàm tính tổng điểm
+    function getTotalScore(scores) {
+        return scores.reduce((a, b) => a + b, 0);
+    }
+
+    // Hàm tính hạng tổng (kiểu 1,2,4,4)
+    function getTotalRank(totalScore) {
+        const totals = students.map(s => getTotalScore(s.scores)).sort((a, b) => b - a);
+        let rank = 1;
+        for (let i = 0; i < totals.length; i++) {
+            if (Math.abs(totals[i] - totalScore) < 1e-9) {
+                return rank;
+            }
+            if (i < totals.length - 1 && totals[i] !== totals[i + 1]) {
+                rank = i + 2;
+            }
+        }
+        return totals.length;
+    }
+
+    // Hàm tra cứu điểm
+    function searchScores() {
+        const inputName = document.getElementById("studentName").value.trim();
+        const resultDiv = document.getElementById("result");
+
+        if (!inputName) {
+            resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
+            return;
         }
 
-        // Hàm tính tổng điểm
-        function getTotalScore(scores) {
-            return scores.reduce((a, b) => a + b, 0);
+        const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
+
+        if (!student) {
+            resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
+            return;
         }
 
-        // Hàm tính hạng tổng (kiểu 1,2,4,4)
-        function getTotalRank(totalScore) {
-            const totals = students.map(s => getTotalScore(s.scores)).sort((a, b) => b - a);
-            let rank = 1;
-            for (let i = 0; i < totals.length; i++) {
-                if (Math.abs(totals[i] - totalScore) < 1e-9) {
-                    return rank;
-                }
-                if (i < totals.length - 1 && totals[i] !== totals[i + 1]) {
-                    rank = i + 2;
-                }
-            }
-            return totals.length;
+        const totalScore = getTotalScore(student.scores);
+        // Mảng ranks giờ sẽ có 4 phần tử (từ index 0 đến 3)
+        const ranks = student.scores.map((score, i) => getTestRank(i, score));
+        const totalRank = getTotalRank(totalScore);
+
+        resultDiv.innerHTML = `
+            <h3>Kết quả của ${student.name}</h3>
+            <table>
+                <tr>
+                    <th>Bài kiểm tra</th>
+                    <th>Điểm</th>
+                    <th>Hạng / 35</th>
+                </tr>
+                <tr>
+                    <td>KT 1 (8/8/2025)</td>
+                    <td>${student.scores[0]}</td>
+                    <td>${ranks[0]}/35</td>
+                </tr>
+                <tr>
+                    <td>KT 2 (22/8/2025)</td>
+                    <td>${student.scores[1]}</td>
+                    <td>${ranks[1]}/35</td>
+                </tr>
+                <tr>
+                    <td>KT 3 (17/9/2025)</td>
+                    <td>${student.scores[2]}</td>
+                    <td>${ranks[2]}/35</td>
+                </tr>
+                <tr>
+                    <td>KT 4 (7/10/2025)</td>
+                    <td>${student.scores[3]}</td>
+                    <td>${ranks[3]}/35</td>
+                </tr>
+                <tr>
+                    <td><b>Tổng điểm</b></td>
+                    <td><b>${totalScore.toFixed(1)}</b></td>
+                    <td><b>${totalRank}/35</b></td>
+                </tr>
+            </table>
+        `;
+    }
+
+    // Xử lý sự kiện nhấn Enter
+    document.getElementById("studentName").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            searchScores();
         }
-
-        // Hàm tra cứu điểm
-        function searchScores() {
-            const inputName = document.getElementById("studentName").value.trim();
-            const resultDiv = document.getElementById("result");
-
-            if (!inputName) {
-                resultDiv.innerHTML = '<p class="error">Vui lòng nhập tên học sinh!</p>';
-                return;
-            }
-
-            const student = students.find(s => s.name.toLowerCase() === inputName.toLowerCase());
-
-            if (!student) {
-                resultDiv.innerHTML = '<p class="error">Không tìm thấy học sinh với tên này!</p>';
-                return;
-            }
-
-            const totalScore = getTotalScore(student.scores);
-            const ranks = student.scores.map((score, i) => getTestRank(i, score));
-            const totalRank = getTotalRank(totalScore);
-
-            resultDiv.innerHTML = `
-                <h3>Kết quả của ${student.name}</h3>
-              <table>
-            <tr>
-                <th>Bài kiểm tra</th>
-                <th>Điểm</th>
-                <th>Hạng / 35</th>
-            </tr>
-            <tr>
-                <td>KT 1 (8/8/2025)</td>
-                <td>${student.scores[0]}</td>
-                <td>${ranks[0]}/35</td>
-            </tr>
-            <tr>
-                <td>KT 2 (22/8/2025)</td>
-                <td>${student.scores[1]}</td>
-                <td>${ranks[1]}/35</td>
-            </tr>
-            <tr>
-                <td>KT 3 (17/9/2025)</td>
-                <td>${student.scores[2]}</td>
-                <td>${ranks[2]}/35</td>
-            </tr>
-            <tr>
-                <td>KT 4 (7/10/2025)</td>
-                <td>${student.scores[3]}</td>
-                <td>${ranks[3]}/35</td>
-            </tr>
-            <tr>
-                <td><b>Tổng điểm</b></td>
-                <td><b>${totalScore.toFixed(1)}</b></td>
-                <td><b>${totalRank}/35</b></td>
-            </tr>
-        </table>
-            `;
-        }
-
-        // Xử lý sự kiện nhấn Enter
-        document.getElementById("studentName").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                searchScores();
-            }
-        });
-    </script>
+    });
+</script>
 </body>
-</html>
+</html>  
 
